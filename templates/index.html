@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AutoTest Platform - Tích hợp Công cụ Kiểm thử Tự động</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #f0f2f5;
+        color: #333;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 220px;
+        background: #1a2b3c;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .logo {
+        padding: 20px 15px;
+        background: #223548;
+        text-align: center;
+        border-bottom: 1px solid #15202b;
+      }
+
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: #007bff;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .logo-text {
+        color: #007bff;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .nav-menu {
+        flex: 1;
+        padding: 0;
+      }
+
+      .nav-item {
+        display: block;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        border-bottom: 1px solid #223548;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-item:hover {
+        background: #223548;
+        padding-left: 25px;
+      }
+
+      .nav-item.active {
+        background: #007bff;
+        border-left: 4px solid #0056b3;
+      }
+
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: brightness(0) invert(1);
+      }
+
+      .dashboard-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>');
+      }
+      .nmap-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>');
+      }
+      .metasploit-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 10.93V12H9l3-3 3 3h-2v15.93c5.16-1.19 9-5.38 9-10.93V7l-10-5z"/></svg>');
+      }
+      .aircrack-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>');
+      }
+      .ai-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M12 1L21.5 6.5v11L12 23l-9.5-5.5v-11L12 1zm0 2.311L4.5 7.653v8.694L12 20.689l7.5-4.342V7.653L12 3.311zM12 6a6 6 0 016 6 6 6 0 01-6 6 6 6 0 01-6-6 6 6 0 016-6zm0 2a4 4 0 00-4 4 4 4 0 004 4 4 4 0 004-4 4 4 0 00-4-4z"/></svg>');
+      }
+      .schedule-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm0-12H5V5h14v2zM7 11h10v2H7zm0 4h10v2H7z"/></svg>');
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        background: white;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top-bar {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .scan-input {
+        flex: 1;
+        max-width: 600px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+
+      .scan-button {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .scan-button:hover {
+        background: #0056b3;
+      }
+
+      .content-area {
+        flex: 1;
+        padding: 25px;
+        overflow-y: auto;
+      }
+
+      .recently-section {
+        margin-bottom: 25px;
+      }
+
+      .recently-section h3 {
+        color: #1a2b3c;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .recently-list {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        font-size: 14px;
+      }
+
+      .recently-item {
+        color: #007bff;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+
+      .recently-item:hover {
+        text-decoration: underline;
+      }
+
+      .modules-section {
+        margin-bottom: 25px;
+      }
+
+      .modules-section h3 {
+        color: #1a2b3c;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+      }
+
+      .module-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .module-item:hover {
+        background: #e9ecef;
+        border-color: #007bff;
+      }
+
+      .module-item.active {
+        background: #007bff;
+        color: white;
+        border-color: #0056b3;
+      }
+
+      .module-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+        background: #007bff;
+        border-radius: 50%;
+      }
+
+      .status-section {
+        background: #e6f3ff;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 25px;
+      }
+
+      .status-text {
+        color: #007bff;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .status-details {
+        color: #555;
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+
+      .view-report-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .export-report-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 10px;
+        margin-left: 10px;
+      }
+
+      .export-report-btn:hover {
+        background: #218838;
+      }
+
+      .results-section {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .results-header {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+      }
+
+      .results-header h3 {
+        color: #1a2b3c;
+        font-size: 16px;
+      }
+
+      .results-grid {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .result-card {
+        text-align: center;
+        flex: 1;
+        padding: 20px;
+        border-radius: 8px;
+        position: relative;
+      }
+
+      .result-number {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: white;
+      }
+
+      .result-label {
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        text-transform: uppercase;
+      }
+
+      .info-websites {
+        background: #007bff;
+      }
+      .critical-severity {
+        background: #dc3545;
+      }
+      .high-severity {
+        background: #fd7e14;
+      }
+      .medium-severity {
+        background: #ffc107;
+      }
+      .low-severity {
+        background: #28a745;
+      }
+
+      /* Tool Content Styles */
+      .tool-content {
+        display: none;
+      }
+
+      .tool-content.active {
+        display: block;
+      }
+
+      .tool-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid #007bff;
+      }
+
+      .tool-title {
+        color: #1a2b3c;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .tool-desc {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .command-section {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        border: 1px solid #dee2e6;
+      }
+
+      .command-prompt {
+        color: #00c4ff;
+        font-weight: bold;
+      }
+
+      .command-output {
+        color: #00ff85;
+      }
+
+      /* Nmap Specific Styles */
+      .nmap-options {
+        margin-bottom: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .option-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .option-card:hover {
+        background: #e9ecef;
+        border-color: #007bff;
+      }
+
+      .option-card.selected {
+        background: #007bff;
+        color: white;
+        border-color: #0056b3;
+      }
+
+      .option-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .option-desc {
+        font-size: 13px;
+        opacity: 0.8;
+      }
+
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      /* Metasploit Specific Styles */
+      .metasploit-options {
+        margin-bottom: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .metasploit-options h3 {
+        color: #1a2b3c;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .metasploit-options .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .metasploit-options .option-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .metasploit-options .option-card:hover {
+        background: #e9ecef;
+        border-color: #007bff;
+      }
+
+      .metasploit-options .option-card.selected {
+        background: #007bff;
+        color: white;
+        border-color: #0056b3;
+      }
+
+      .metasploit-options .option-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      .auxiliary-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm0 18a8 8 0 01-8-8 8 8 0 018-8 8 8 0 018 8 8 8 0 01-8 8zm4-8h-3V9h-2v3H8v2h3v3h2v-3h3z"/></svg>');
+      }
+      .exploit-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 10.93V12H9l3-3 3 3h-2v15.93c5.16-1.19 9-5.38 9-10.93V7l-10-5z"/></svg>');
+      }
+      .payload-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm-1 15v-2h2v2h-2zm1-4c-1.1 0-2-.9-2-2V7h2v4h2v2h-2z"/></svg>');
+      }
+      .post-exploit-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm0 18a8 8 0 01-8-8 8 8 0 018-8 8 8 0 018 8 8 8 0 01-8 8zm-1-5h2v2h-2zm0-8h2v6h-2z"/></svg>');
+      }
+      .meterpreter-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm-1 15v-2h2v2h-2zm1-4c-1.1 0-2-.9-2-2V7h2v4h2v2h-2z"/></svg>');
+      }
+      .db-icon {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm0 4c2.76 0 5 1.79 5 4s-2.24 4-5 4-5-1.79-5-4 2.24-4 5-4zm0 12c-2.76 0-5-1.79-5-4h10c0 2.21-2.24 4-5 4z"/></svg>');
+      }
+
+      .option-content {
+        flex: 1;
+      }
+
+      .metasploit-status {
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 25px;
+      }
+
+      .metasploit-status.running {
+        background: #d4edda;
+        border-color: #c3e6cb;
+      }
+
+      .metasploit-status.error {
+        background: #f8d7da;
+        border-color: #f5c6cb;
+      }
+
+      .status-text {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .status-text.running {
+        color: #155724;
+      }
+      .status-text.error {
+        color: #721c24;
+      }
+
+      .status-details {
+        font-size: 13px;
+        color: #555;
+      }
+
+      .metasploit-results h3 {
+        color: #1a2b3c;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .schedule-section {
+        margin-bottom: 25px;
+      }
+
+      .schedule-section h3 {
+        color: #1a2b3c;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .schedule-form {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+      }
+
+      .schedule-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      .schedule-form input,
+      .schedule-form select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+      }
+
+      .schedule-form button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .schedule-form button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="logo">
+          <div class="logo-icon">A</div>
+          <div class="logo-text">AutoTest Platform</div>
+        </div>
+
+        <nav class="nav-menu">
+          <div class="nav-item active" data-tool="dashboard">
+            <div class="nav-icon dashboard-icon"></div>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item" data-tool="nmap">
+            <div class="nav-icon nmap-icon"></div>
+            <span>Nmap</span>
+          </div>
+          <div class="nav-item" data-tool="metasploit">
+            <div class="nav-icon metasploit-icon"></div>
+            <span>Metasploit</span>
+          </div>
+          <div class="nav-item" data-tool="aircrack">
+            <div class="nav-icon aircrack-icon"></div>
+            <span>Aircrack-ng</span>
+          </div>
+          <div class="nav-item" data-tool="ai">
+            <div class="nav-icon ai-icon"></div>
+            <span>AI Tự động</span>
+          </div>
+          <div class="nav-item" data-tool="schedule">
+            <div class="nav-icon schedule-icon"></div>
+            <span>Lập lịch</span>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="top-bar">
+          <input
+            type="text"
+            class="scan-input"
+            placeholder="Nhập URL hoặc IP (VD: 192.168.1.100)"
+            id="target-input"
+          />
+          <button class="scan-button" onclick="startScan()">KIỂM THỬ</button>
+        </div>
+
+        <div class="content-area">
+          <!-- Dashboard Content -->
+          <div class="tool-content active" id="dashboard-content">
+            <div class="recently-section">
+              <h3>Lịch sử kiểm thử:</h3>
+              <div class="recently-list">
+                <div class="recently-item">
+                  http://testphp.vulnweb.com - 2023-09-27
+                </div>
+                <div class="recently-item">192.168.1.100 - 2023-09-26</div>
+                <div class="recently-item">http://mta.edu.vn - 2023-09-25</div>
+                <div class="recently-item">
+                  http://testhtml5.vulnweb.com - 2023-09-24
+                </div>
+                <div class="recently-item">192.168.1.101 - 2023-09-23</div>
+              </div>
+            </div>
+
+            <div class="modules-section">
+              <h3>Chọn module kiểm thử</h3>
+              <div class="modules-grid">
+                <div class="module-item active">
+                  <div class="module-icon"></div>
+                  <span>Tất cả module</span>
+                </div>
+                <div class="module-item">
+                  <div class="module-icon"></div>
+                  <span>Nmap: Quét cổng và dịch vụ</span>
+                </div>
+                <div class="module-item">
+                  <div class="module-icon"></div>
+                  <span>Metasploit: Kiểm tra khai thác lỗ hổng</span>
+                </div>
+                <div class="module-item">
+                  <div class="module-icon"></div>
+                  <span>Aircrack-ng: Kiểm thử bảo mật WiFi</span>
+                </div>
+                <div class="module-item">
+                  <div class="module-icon"></div>
+                  <span>AI: Phân tích và ưu tiên lỗ hổng</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="status-section" id="scan-status" style="display: none">
+              <div class="status-text">Trạng thái: Kiểm thử hoàn tất</div>
+              <div class="status-details">
+                Mục tiêu: <span id="status-target"></span>
+              </div>
+              <div class="status-details">
+                Bắt đầu: <span id="status-start-time"></span>
+              </div>
+              <div class="status-details">
+                Thời gian thực hiện: <span id="status-elapsed"></span>
+              </div>
+              <button class="view-report-btn">Xem báo cáo chi tiết</button>
+              <button
+                class="export-report-btn"
+                onclick="exportReport('dashboard')"
+              >
+                Xuất báo cáo
+              </button>
+            </div>
+
+            <div class="results-section">
+              <div class="results-header">
+                <h3>Kết quả kiểm thử:</h3>
+              </div>
+              <div class="results-grid">
+                <div class="result-card info-websites">
+                  <div class="result-number" id="info-count">0</div>
+                  <div class="result-label">Thông tin mục tiêu</div>
+                </div>
+                <div class="result-card critical-severity">
+                  <div class="result-number" id="critical-count">17</div>
+                  <div class="result-label">Mức độ nghiêm trọng</div>
+                </div>
+                <div class="result-card high-severity">
+                  <div class="result-number" id="high-count">0</div>
+                  <div class="result-label">Mức độ cao</div>
+                </div>
+                <div class="result-card medium-severity">
+                  <div class="result-number" id="medium-count">15</div>
+                  <div class="result-label">Mức độ trung bình</div>
+                </div>
+                <div class="result-card low-severity">
+                  <div class="result-number" id="low-count">95</div>
+                  <div class="result-label">Mức độ thấp</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nmap Content -->
+          <div class="tool-content" id="nmap-content">
+            <div class="tool-header">
+              <div class="tool-title">Nmap - Network Mapper</div>
+              <div class="tool-desc">
+                Công cụ quét mạng và phát hiện dịch vụ để kiểm tra cổng và lỗ
+                hổng
+              </div>
+            </div>
+
+            <div class="nmap-options">
+              <div class="options-grid">
+                <div class="option-card selected" data-scan-type="quick">
+                  <div class="option-title">Quét nhanh</div>
+                  <div class="option-desc">Quét các cổng phổ biến (-F)</div>
+                </div>
+                <div class="option-card" data-scan-type="full">
+                  <div class="option-title">Quét toàn diện</div>
+                  <div class="option-desc">Quét tất cả 65535 cổng (-p-)</div>
+                </div>
+                <div class="option-card" data-scan-type="stealth">
+                  <div class="option-title">Quét ẩn</div>
+                  <div class="option-desc">Quét SYN ẩn (-sS)</div>
+                </div>
+                <div class="option-card" data-scan-type="service">
+                  <div class="option-title">Phát hiện dịch vụ</div>
+                  <div class="option-desc">
+                    Xác định phiên bản dịch vụ (-sV)
+                  </div>
+                </div>
+                <div class="option-card" data-scan-type="os">
+                  <div class="option-title">Phát hiện OS</div>
+                  <div class="option-desc">Xác định hệ điều hành (-O)</div>
+                </div>
+                <div class="option-card" data-scan-type="script">
+                  <div class="option-title">Quét Script</div>
+                  <div class="option-desc">
+                    Chạy các script NSE mặc định (-sC)
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button class="scan-button" onclick="runNmapScan()">
+                  Chạy quét Nmap
+                </button>
+                <button
+                  class="export-report-btn"
+                  onclick="exportReport('nmap')"
+                >
+                  Xuất báo cáo Nmap
+                </button>
+              </div>
+
+              <div class="results-section">
+                <h3>Kết quả quét:</h3>
+                <div class="command-section" id="nmap-output">
+                  <div>
+                    <span class="command-prompt">root@kali:~#</span> Đang chờ
+                    kết quả quét...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metasploit Content -->
+          <div class="tool-content" id="metasploit-content">
+            <div class="tool-header">
+              <div class="tool-title">Metasploit Framework</div>
+              <div class="tool-desc">
+                Nền tảng kiểm thử thâm nhập để phát triển và khai thác lỗ hổng
+              </div>
+            </div>
+
+            <div class="metasploit-options">
+              <h3>Chọn Module Metasploit</h3>
+              <div class="options-grid">
+                <div
+                  class="option-card selected"
+                  data-module="auxiliary/scanner/portscan/tcp"
+                >
+                  <div class="option-icon auxiliary-icon"></div>
+                  <div class="option-title">Module phụ trợ</div>
+                  <div class="option-desc">
+                    Công cụ quét và thu thập thông tin
+                  </div>
+                </div>
+                <div
+                  class="option-card"
+                  data-module="exploit/windows/smb/ms17_010_eternalblue"
+                >
+                  <div class="option-icon exploit-icon"></div>
+                  <div class="option-title">Module khai thác</div>
+                  <div class="option-desc">Khung khai thác chủ động</div>
+                </div>
+                <div
+                  class="option-card"
+                  data-module="payload/windows/meterpreter/reverse_tcp"
+                >
+                  <div class="option-icon payload-icon"></div>
+                  <div class="option-title">Tạo Payload</div>
+                  <div class="option-desc">Tạo payload và mã hóa tùy chỉnh</div>
+                </div>
+                <div
+                  class="option-card"
+                  data-module="post/windows/gather/credentials"
+                >
+                  <div class="option-icon post-exploit-icon"></div>
+                  <div class="option-title">Hậu khai thác</div>
+                  <div class="option-desc">
+                    Duy trì truy cập và thu thập thông tin
+                  </div>
+                </div>
+                <div class="option-card" data-module="exploit/multi/handler">
+                  <div class="option-icon meterpreter-icon"></div>
+                  <div class="option-title">Meterpreter</div>
+                  <div class="option-desc">
+                    Payload nâng cao cho hậu khai thác
+                  </div>
+                </div>
+                <div
+                  class="option-card"
+                  data-module="auxiliary/server/capture/smb"
+                >
+                  <div class="option-icon db-icon"></div>
+                  <div class="option-title">Tích hợp cơ sở dữ liệu</div>
+                  <div class="option-desc">Lưu trữ và quản lý kết quả quét</div>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button class="scan-button" onclick="runMetasploit()">
+                  Chạy Metasploit
+                </button>
+                <button
+                  class="export-report-btn"
+                  onclick="exportReport('metasploit')"
+                >
+                  Xuất báo cáo Metasploit
+                </button>
+              </div>
+
+              <div class="results-section">
+                <h3>Kết quả thực thi:</h3>
+                <div class="command-section" id="metasploit-output">
+                  <div>
+                    <span class="command-prompt">msf6 ></span> Chưa thực thi
+                    lệnh Metasploit...
+                  </div>
+                </div>
+              </div>
+
+              <div class="metasploit-status" id="metasploit-status">
+                <div class="status-text">Trạng thái: Chưa thực thi</div>
+                <div class="status-details">
+                  Mục tiêu:
+                  <span id="metasploit-target-status">Chưa xác định</span>
+                </div>
+                <div class="status-details">
+                  Thời gian bắt đầu:
+                  <span id="metasploit-start-time">Chưa bắt đầu</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aircrack-ng Content -->
+          <div class="tool-content" id="aircrack-content">
+            <div class="tool-header">
+              <div class="tool-title">Aircrack-ng Suite</div>
+              <div class="tool-desc">
+                Bộ công cụ đánh giá bảo mật mạng WiFi và kiểm thử thâm nhập
+                không dây
+              </div>
+            </div>
+            <div class="options-grid">
+              <div class="option-card selected">
+                <div class="option-title">Chế độ giám sát</div>
+                <div class="option-desc">
+                  Kích hoạt giám sát giao diện không dây
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Airodump-ng</div>
+                <div class="option-desc">
+                  Ghi lại và phân tích gói tin không dây
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Aireplay-ng</div>
+                <div class="option-desc">Tiêm gói tin và tấn công phát lại</div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Aircrack-ng</div>
+                <div class="option-desc">
+                  Công cụ khôi phục mật khẩu WEP/WPA
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Tấn công Deauth</div>
+                <div class="option-desc">Ngắt kết nối client</div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Evil Twin</div>
+                <div class="option-desc">Tạo điểm truy cập giả mạo</div>
+              </div>
+            </div>
+            <div class="command-section">
+              <div>
+                <span class="command-prompt">root@kali:~#</span> airmon-ng start
+                wlan0
+              </div>
+              <div class="command-output">
+                Interface wlan0 -> wlan0mon (monitor mode enabled)
+              </div>
+              <div>
+                <span class="command-prompt">root@kali:~#</span> airodump-ng
+                wlan0mon
+              </div>
+              <div class="command-output">
+                BSSID PWR Beacons #Data, #/s CH MB ENC CIPHER AUTH ESSID
+              </div>
+              <div class="command-output">
+                AA:BB:CC:DD:EE:FF -30 42 0 0 6 54e WPA2 CCMP PSK MyNetwork
+              </div>
+              <div class="command-output">
+                11:22:33:44:55:66 -45 18 5 0 11 54e WEP WEP OpenWiFi
+              </div>
+              <div>
+                <span class="command-prompt">root@kali:~#</span> aircrack-ng -w
+                wordlist.txt capture.cap
+              </div>
+              <div class="command-output">
+                [00:02:15] 45678/87543 keys tested (342.56 k/s)
+              </div>
+              <div class="command-output">KEY FOUND! [ password123 ]</div>
+            </div>
+            <button
+              class="export-report-btn"
+              onclick="exportReport('aircrack')"
+            >
+              Xuất báo cáo Aircrack-ng
+            </button>
+          </div>
+
+          <!-- AI Auto Deploy Content -->
+          <div class="tool-content" id="ai-content">
+            <div class="tool-header">
+              <div class="tool-title">AI Tự động Hóa</div>
+              <div class="tool-desc">
+                Sử dụng AI để tự động phát hiện, phân tích và đề xuất khắc phục
+                lỗ hổng
+              </div>
+            </div>
+            <div class="options-grid">
+              <div class="option-card selected">
+                <div class="option-title">Quét tự động</div>
+                <div class="option-desc">
+                  Tự động phát hiện và quét các lỗ hổng
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Phân tích lỗ hổng</div>
+                <div class="option-desc">
+                  Ưu tiên lỗ hổng dựa trên mức độ nghiêm trọng
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Báo cáo thông minh</div>
+                <div class="option-desc">
+                  Tạo báo cáo chi tiết với đề xuất khắc phục
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-title">Tích hợp công cụ</div>
+                <div class="option-desc">
+                  Tự động chạy Nmap, Metasploit, Aircrack-ng
+                </div>
+              </div>
+            </div>
+            <div class="command-section">
+              <div>
+                <span class="command-prompt">AI@platform:~#</span> auto_scan
+                --target <span id="ai-target">http://example.com</span>
+              </div>
+              <div class="command-output">
+                [*] Starting AI-driven vulnerability scan...
+              </div>
+              <div class="command-output">
+                [*] Detected vulnerabilities: 5 critical, 10 medium, 20 low
+              </div>
+              <div class="command-output">
+                [*] Generating remediation report...
+              </div>
+              <div class="command-output">
+                [*] Report saved: report_2023-09-27.pdf
+              </div>
+            </div>
+            <button class="export-report-btn" onclick="exportReport('ai')">
+              Xuất báo cáo AI
+            </button>
+          </div>
+
+          <!-- Schedule Content -->
+          <div class="tool-content" id="schedule-content">
+            <div class="tool-header">
+              <div class="tool-title">Lập lịch Kiểm thử</div>
+              <div class="tool-desc">
+                Cấu hình kiểm thử định kỳ với các công cụ và AI
+              </div>
+            </div>
+            <div class="schedule-section">
+              <h3>Cấu hình lịch kiểm thử</h3>
+              <div class="schedule-form">
+                <label>Mục tiêu</label>
+                <input
+                  type="text"
+                  placeholder="http://example.com hoặc 192.168.1.100"
+                />
+                <label>Công cụ</label>
+                <select>
+                  <option>Nmap</option>
+                  <option>Metasploit</option>
+                  <option>Aircrack-ng</option>
+                  <option>AI Tự động</option>
+                </select>
+                <label>Tần suất</label>
+                <select>
+                  <option>Hàng ngày</option>
+                  <option>Hàng tuần</option>
+                  <option>Hàng tháng</option>
+                </select>
+                <button>Lên lịch</button>
+                <button
+                  class="export-report-btn"
+                  onclick="exportReport('schedule')"
+                >
+                  Xuất báo cáo Lập lịch
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // JavaScript để xử lý chuyển đổi giữa các tab
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          document
+            .querySelectorAll(".nav-item")
+            .forEach((i) => i.classList.remove("active"));
+          document
+            .querySelectorAll(".tool-content")
+            .forEach((c) => c.classList.remove("active"));
+
+          item.classList.add("active");
+          const tool = item.getAttribute("data-tool");
+          document.getElementById(`${tool}-content`).classList.add("active");
+        });
+      });
+
+      // JavaScript để xử lý chọn module
+      document.querySelectorAll(".module-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          document
+            .querySelectorAll(".module-item")
+            .forEach((i) => i.classList.remove("active"));
+          item.classList.add("active");
+        });
+      });
+
+      // JavaScript để xử lý chọn tùy chọn công cụ
+      document.querySelectorAll(".option-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          card.parentElement
+            .querySelectorAll(".option-card")
+            .forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+        });
+      });
+
+      // Hàm giả lập bắt đầu kiểm thử
+      function startScan() {
+        const target = document.getElementById("target-input").value;
+        const statusSection = document.getElementById("scan-status");
+        const statusTarget = document.getElementById("status-target");
+        const statusStartTime = document.getElementById("status-start-time");
+        const statusElapsed = document.getElementById("status-elapsed");
+
+        const results = {
+          critical: 17,
+          high: 0,
+          medium: 15,
+          low: 95,
+        };
+
+        if (target) {
+          statusSection.style.display = "block";
+          statusTarget.textContent = target;
+          statusStartTime.textContent = new Date().toLocaleString();
+          statusElapsed.textContent = "Đang thực hiện...";
+
+          document.getElementById("metasploit-target-status").textContent =
+            target;
+          document.getElementById("ai-target").textContent = target;
+
+          document.getElementById("critical-count").textContent =
+            results.critical;
+          document.getElementById("high-count").textContent = results.high;
+          document.getElementById("medium-count").textContent = results.medium;
+          document.getElementById("low-count").textContent = results.low;
+
+          setTimeout(() => {
+            statusElapsed.textContent = "7.67s";
+            statusSection.querySelector(
+              ".status-text"
+            ).textContent = `Trạng thái: Kiểm thử ${target} hoàn tất`;
+          }, 2000);
+        } else {
+          alert("Vui lòng nhập URL hoặc IP mục tiêu!");
+        }
+      }
+
+      // Hàm chạy quét Nmap
+      async function runNmapScan() {
+        const target = document.getElementById("target-input").value;
+        const outputDiv = document.getElementById("nmap-output");
+        const selectedOption = document.querySelector(
+          "#nmap-content .option-card.selected"
+        );
+        const scanType = selectedOption
+          ? selectedOption.getAttribute("data-scan-type")
+          : "quick";
+
+        if (!target) {
+          alert("Vui lòng nhập URL hoặc IP mục tiêu!");
+          return;
+        }
+
+        outputDiv.innerHTML =
+          '<div><span class="command-prompt">root@kali:~#</span> Đang chạy quét Nmap...</div>';
+
+        try {
+          const response = await fetch("http://localhost:5000/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ target, scan_type: scanType }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            outputDiv.innerHTML = `<div><span class="command-prompt">root@kali:~#</span> Lỗi: ${data.error}</div>`;
+          } else {
+            outputDiv.innerHTML = `
+                        <div><span class="command-prompt">root@kali:~#</span> nmap ${
+                          scanType === "quick"
+                            ? "-F"
+                            : scanType === "full"
+                            ? "-p-"
+                            : scanType === "stealth"
+                            ? "-sS"
+                            : scanType === "service"
+                            ? "-sV"
+                            : scanType === "os"
+                            ? "-O"
+                            : "-sC"
+                        } ${target}</div>
+                        <div class="command-output">${data.output.replace(
+                          /\n/g,
+                          "<br>"
+                        )}</div>
+                    `;
+          }
+        } catch (error) {
+          outputDiv.innerHTML = `<div><span class="command-prompt">root@kali:~#</span> Lỗi: Không thể kết nối tới server!</div>`;
+        }
+      }
+
+      // Hàm chạy Metasploit
+      async function runMetasploit() {
+        const target = document.getElementById("target-input").value;
+        const statusDiv = document.getElementById("metasploit-status");
+        const outputDiv = document.getElementById("metasploit-output");
+        const startTime = new Date().toLocaleString();
+        const selectedOption = document.querySelector(
+          "#metasploit-content .option-card.selected"
+        );
+        const module = selectedOption
+          ? selectedOption.getAttribute("data-module")
+          : "auxiliary/scanner/portscan/tcp";
+
+        if (!target) {
+          alert("Vui lòng nhập URL hoặc IP mục tiêu!");
+          return;
+        }
+
+        statusDiv.className = "metasploit-status running";
+        statusDiv.innerHTML = `
+                <div class="status-text running">Trạng thái: Đang thực thi</div>
+                <div class="status-details">Mục tiêu: ${target}</div>
+                <div class="status-details">Thời gian bắt đầu: ${startTime}</div>
+            `;
+
+        outputDiv.innerHTML =
+          '<div><span class="command-prompt">msf6 ></span> Đang chạy Metasploit...</div>';
+
+        try {
+          const response = await fetch("http://localhost:5001/metasploit/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ target, module }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            outputDiv.innerHTML = `<div><span class="command-prompt">msf6 ></span> Lỗi: ${data.error}</div>`;
+            statusDiv.className = "metasploit-status error";
+            statusDiv.innerHTML = `
+                        <div class="status-text error">Trạng thái: Lỗi</div>
+                        <div class="status-details">Mục tiêu: ${target}</div>
+                        <div class="status-details">Thời gian bắt đầu: ${startTime}</div>
+                    `;
+          } else {
+            outputDiv.innerHTML = `
+                        <div><span class="command-prompt">msf6 ></span> use ${module}</div>
+                        <div><span class="command-prompt">msf6 (${module}) ></span> set RHOSTS ${target}</div>
+                        <div class="command-output">${data.output.replace(
+                          /\n/g,
+                          "<br>"
+                        )}</div>
+                    `;
+            statusDiv.className = "metasploit-status";
+            statusDiv.innerHTML = `
+                        <div class="status-text">Trạng thái: Hoàn tất</div>
+                        <div class="status-details">Mục tiêu: ${target}</div>
+                        <div class="status-details">Thời gian bắt đầu: ${startTime}</div>
+                    `;
+          }
+        } catch (error) {
+          outputDiv.innerHTML = `<div><span class="command-prompt">msf6 ></span> Lỗi: Không thể kết nối tới server!</div>`;
+          statusDiv.className = "metasploit-status error";
+          statusDiv.innerHTML = `
+                    <div class="status-text error">Trạng thái: Lỗi</div>
+                    <div class="status-details">Mục tiêu: ${target}</div>
+                    <div class="status-details">Thời gian bắt đầu: ${startTime}</div>
+                `;
+        }
+      }
+
+      // Hàm xuất báo cáo
+      function exportReport(tool) {
+        const target =
+          document.getElementById("target-input").value || "unknown";
+        let reportContent = "";
+        const timestamp = new Date().toLocaleString();
+
+        switch (tool) {
+          case "dashboard":
+            reportContent = `
+AutoTest Platform - Báo cáo Tổng quan
+Mục tiêu: ${target}
+Thời gian: ${timestamp}
+Kết quả kiểm thử:
+- Thông tin mục tiêu: 0
+- Lỗ hổng nghiêm trọng: 17
+- Lỗ hổng mức cao: 0
+- Lỗ hổng mức trung bình: 15
+- Lỗ hổng mức thấp: 95
+                    `;
+            break;
+          case "nmap":
+            const nmapOutput = document.getElementById("nmap-output").innerText;
+            reportContent = `
+AutoTest Platform - Báo cáo Nmap
+Mục tiêu: ${target}
+Thời gian: ${timestamp}
+Kết quả:
+${nmapOutput}
+                    `;
+            break;
+          case "metasploit":
+            const metasploitOutput =
+              document.getElementById("metasploit-output").innerText;
+            reportContent = `
+AutoTest Platform - Báo cáo Metasploit
+Mục tiêu: ${target}
+Thời gian: ${timestamp}
+Kết quả:
+${metasploitOutput}
+                    `;
+            break;
+          case "aircrack":
+            reportContent = `
+AutoTest Platform - Báo cáo Aircrack-ng
+Mục tiêu: WiFi Network
+Thời gian: ${timestamp}
+Lệnh: airmon-ng start wlan0; airodump-ng wlan0mon; aircrack-ng -w wordlist.txt capture.cap
+Kết quả:
+- Interface wlan0 -> wlan0mon (monitor mode enabled)
+- BSSID: AA:BB:CC:DD:EE:FF, ESSID: MyNetwork, ENC: WPA2
+- BSSID: 11:22:33:44:55:66, ESSID: OpenWiFi, ENC: WEP
+- Key found: password123
+                    `;
+            break;
+          case "ai":
+            reportContent = `
+AutoTest Platform - Báo cáo AI Tự động
+Mục tiêu: ${document.getElementById("ai-target").textContent}
+Thời gian: ${timestamp}
+Lệnh: auto_scan --target ${document.getElementById("ai-target").textContent}
+Kết quả:
+- Detected vulnerabilities: 5 critical, 10 medium, 20 low
+- Report saved: report_${timestamp.replace(/[:,\s]/g, "-")}.pdf
+                    `;
+            break;
+          case "schedule":
+            reportContent = `
+AutoTest Platform - Báo cáo Lập lịch
+Thời gian: ${timestamp}
+Kế hoạch kiểm thử:
+- Mục tiêu: ${
+              document.querySelector(".schedule-form input").value ||
+              "Chưa xác định"
+            }
+- Công cụ: ${document.querySelector(".schedule-form select").value}
+- Tần suất: ${
+              document.querySelector(".schedule-form select:nth-of-type(2)")
+                .value
+            }
+                    `;
+            break;
+          default:
+            reportContent = "Không có dữ liệu báo cáo";
+        }
+
+        const blob = new Blob([reportContent], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `report_${tool}_${timestamp.replace(/[:,\s]/g, "-")}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        alert(`Báo cáo cho ${tool} đã được xuất!`);
+      }
+    </script>
+  </body>
+</html>
